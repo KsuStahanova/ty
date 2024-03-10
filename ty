@@ -1,0 +1,145 @@
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.text.SimpleDateFormat;
+
+//  Заказ
+class Order {
+    private int orderId;
+    private double totalAmount;
+    private Date orderDate;
+
+    public Order(int orderId, double totalAmount, Date orderDate) {
+        this.orderId = orderId;
+        this.totalAmount = totalAmount;
+        this.orderDate = orderDate;
+    }
+}
+
+//  Счет
+class Invoice {
+    private int invoiceId;
+    private double amount;
+    private Date invoiceDate;
+
+    public Invoice(int invoiceId, double amount, Date invoiceDate) {
+        this.invoiceId = invoiceId;
+        this.amount = amount;
+        this.invoiceDate = invoiceDate;
+    }
+}
+
+// Документ 
+class PaymentDocument {
+    private int paymentId;
+    private double paymentAmount;
+    private Date paymentDate;
+
+    public PaymentDocument(int paymentId, double paymentAmount, Date paymentDate) {
+        this.paymentId = paymentId;
+        this.paymentAmount = paymentAmount;
+        this.paymentDate = paymentDate;
+    }
+}
+
+//  Накладная
+class Waybill {
+    private int waybillId;
+    private String products;
+    private Date shippingDate;
+
+    public Waybill(int waybillId, String products, Date shippingDate) {
+        this.waybillId = waybillId;
+        this.products = products;
+        this.shippingDate = shippingDate;
+    }
+}
+
+// Интерфейс 
+interface DocumentService {
+    void createOrder(Order order);
+    void createInvoice(Invoice invoice);
+    void createPaymentDocument(PaymentDocument paymentDocument);
+    void createWaybill(Waybill waybill);
+    void displayAllDocuments();
+}
+
+// Реализация DocumentService
+@Service
+class DocumentServiceImpl implements DocumentService {
+    private List<Order> orders = new ArrayList<>();
+    private List<Invoice> invoices = new ArrayList<>();
+    private List<PaymentDocument> paymentDocuments = new ArrayList<>();
+    private List<Waybill> waybills = new ArrayList<>();
+
+    public void createOrder(Order order) {
+        orders.add(order);
+    }
+
+    public void createInvoice(Invoice invoice) {
+        invoices.add(invoice);
+    }
+
+    public void createPaymentDocument(PaymentDocument paymentDocument) {
+        paymentDocuments.add(paymentDocument);
+    }
+
+    public void createWaybill(Waybill waybill) {
+        waybills.add(waybill);
+    }
+
+    public void displayAllDocuments() {
+        System.out.println("Заказы: " + orders);
+        System.out.println("Счета: " + invoices);
+        System.out.println("Документы оплаты: " + paymentDocuments);
+        System.out.println("Накладные: " + waybills);
+    }
+}
+
+// MainApp
+@SpringBootApplication
+public class MainApp implements CommandLineRunner {
+
+    @Autowired
+    private DocumentService documentService;
+
+    public static void main(String[] args) {
+        SpringApplication.run(MainApp.class, args);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        Scanner scanner = new Scanner(System.in);
+
+        // Ввод данных для заказа
+        System.out.println("Введите ID заказа:");
+        int orderId = scanner.nextInt();
+
+        System.out.println("Введите общую сумму заказа:");
+        double totalAmount = scanner.nextDouble();
+
+        Order order = new Order(orderId, totalAmount, new Date());
+
+        documentService.createOrder(order);
+
+       
+        System.out.println("Введите ID счета:");
+        int invoiceId = scanner.nextInt();
+
+        System.out.println("Введите сумму счета:");
+        double amount = scanner.nextDouble();
+
+        Invoice invoice = new Invoice(invoiceId, amount, new Date());
+
+        documentService.createInvoice(invoice);
+
+        documentService.displayAllDocuments();
+
+        scanner.close();
+    }
+}
+
